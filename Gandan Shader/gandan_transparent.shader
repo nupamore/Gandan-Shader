@@ -1,5 +1,5 @@
-// Gandan Shader v1.0 (MIT License)
-// Copyright (c) 2019 nupamore
+// Gandan Shader v1.0.1
+// Copyright (c) 2019 nupamore, MIT licence
 // https://github.com/nupamore/Gandan-Shader
 Shader "gandan shader/Gandan Transparent"
 {
@@ -86,7 +86,7 @@ Shader "gandan shader/Gandan Transparent"
                 float rimIntensity = smoothstep(0.5, 0.6, rimDot * pow(NdotH, 0.5));
                 float4 rim = _isRim * rimIntensity * _LightColor0 * 2;
                 float4 tex = tex2D(_MainTex, i.uv);
-                float4 ambient = saturate(float4(ShadeSH9(0.7), 1));
+                float4 ambient = float4(ShadeSH9(float4(1,0,0,1)), 1);
                 float4 finalColor = saturate(light + rim + ambient) * 1.05 * tex * _Color;
                 finalColor.a = tex.a * _Color.a * tex2D(_alphaMask, i.uv);
                 return lerp(finalColor, tex, _UnlitThreshold);
@@ -148,9 +148,9 @@ Shader "gandan shader/Gandan Transparent"
                 float3 color = saturate(tex * _LightColor0.rgb);
                 float3 vertexToLightSource = _WorldSpaceLightPos0.xyz - i.posWorld.xyz;
                 float distance = length(vertexToLightSource);
-                float atten = saturate(pow(1 / distance, 10) * 0.1);
                 float3 lightDirection = normalize(vertexToLightSource);
                 float NdotL = !_isToon ? 1 : dot(i.worldNormal, lightDirection) - 0.3 > 0 ? 0.6 : 0.2;
+                UNITY_LIGHT_ATTENUATION(atten, i, i.posWorld.xyz);
                 float4 finalColor = float4(atten * color * NdotL, 1) * tex.a * _Color.a * tex2D(_alphaMask, i.uv);
                 return lerp(finalColor, 0, _UnlitThreshold);
             }
